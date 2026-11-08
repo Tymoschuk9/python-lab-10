@@ -68,6 +68,7 @@ class HealthResponse(BaseModel):
     status: str
     app_name: str
     environment: str
+    app_env: Optional[str] = "development"
 
 
 class BatchProductsRequest(BaseModel):

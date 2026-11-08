@@ -80,6 +80,7 @@ async def health_check() -> HealthResponse:
         status="ok",
         app_name=current_settings.app_name,
         environment=current_settings.environment,
+        app_env=getattr(current_settings, "app_env", current_settings.environment),
     )
 
 
