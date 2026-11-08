@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "lab_10"
+name = "online-store"
 version = "1.0.0"
 description = "Laboratory work #10 (Variant 3) - Production Python: Docker, CI/CD, and Final Defense"
 readme = "README.md"
@@ -22,9 +22,12 @@ dev = [
     "pytest>=8.0",
     "pytest-cov",
     "build",
+    "ruff",
+    "mypy",
 ]
 
 [project.scripts]
+online-store = "online_store.main:main"
 lab_10 = "lab_10.main:main"
 
 [tool.pytest.ini_options]
@@ -34,7 +37,7 @@ addopts = ["-ra"]
 
 [tool.coverage.run]
 branch = true
-source = ["lab_10"]
+source = ["online_store", "lab_10"]
 omit = ["*/main.py", "main.py"]
 
 [tool.coverage.report]

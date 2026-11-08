@@ -68,3 +68,8 @@ class HealthResponse(BaseModel):
     status: str
     app_name: str
     environment: str
+
+
+class BatchProductsRequest(BaseModel):
+    product_ids: list[int] = Field(min_length=1)
+

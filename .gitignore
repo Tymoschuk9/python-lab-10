@@ -31,4 +31,3 @@ ENV/
 *.sqlite3
 .coverage
 htmlcov/
-.github/

@@ -201,3 +201,36 @@ def test_statistics(client) -> None:
     exp_res = client.get("/statistics/most-expensive")
     assert exp_res.status_code == 200
     assert exp_res.json()["name"] == "Дорогий"
+
+
+def test_batch_products_concurrent(client) -> None:
+    cat_id = client.post("/categories", json={"name": "BatchCategory"}).json()["id"]
+    p1 = client.post("/products", json={"name": "Item 1", "category_id": cat_id, "price": 10.0, "quantity": 5}).json()["id"]
+    p2 = client.post("/products", json={"name": "Item 2", "category_id": cat_id, "price": 20.0, "quantity": 5}).json()["id"]
+
+    batch_res = client.post("/products/batch", json={"product_ids": [p1, p2, 99999]})
+    assert batch_res.status_code == 200
+    data = batch_res.json()
+    assert len(data) == 3
+    assert data[0]["name"] == "Item 1"
+    assert data[1]["name"] == "Item 2"
+    assert data[2]["error"] == "Not found"
+
+
+@pytest.mark.asyncio
+async def test_external_api_fetch():
+    from unittest.mock import AsyncMock, MagicMock, patch
+    try:
+        from lab_10.external_api import fetch_many_products
+    except ImportError:
+        from online_store.external_api import fetch_many_products
+
+    mock_resp = MagicMock()
+    mock_resp.json.return_value = {"id": 1, "name": "Mock Product"}
+    mock_resp.raise_for_status.return_value = None
+
+    with patch("httpx.AsyncClient.get", new_callable=AsyncMock) as mock_get:
+        mock_get.return_value = mock_resp
+        results = await fetch_many_products("http://test", [1, 2])
+        assert len(results) == 2
+        assert results[0]["name"] == "Mock Product"

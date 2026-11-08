@@ -20,6 +20,7 @@ try:
         PurchaseRequest,
         PurchaseResponse,
         InventoryStatistics,
+        BatchProductsRequest,
     )
     from .services import ShopService, purchase_product
 except (ImportError, ValueError):
@@ -264,3 +265,42 @@ async def get_most_expensive(session: Session = Depends(get_session)) -> Product
             detail="Товарів на складі немає",
         )
     return most_exp
+
+
+# --- ASYNC BATCH ENDPOINT ---
+
+@app.post("/products/batch")
+async def batch_fetch_products(
+    data: BatchProductsRequest,
+    session: Session = Depends(get_session),
+) -> list[dict]:
+    """
+    Асинхронне конкурентне отримання інформації про декілька товарів
+    з використанням Semaphore для обмеження конкурентності.
+    """
+    semaphore = asyncio.Semaphore(3)
+
+    async def get_one(pid: int) -> dict:
+        async with semaphore:
+            await asyncio.sleep(0.01)
+            repo = ProductRepository(session)
+            p = repo.get_by_id(pid)
+            if p:
+                return {
+                    "id": p.id,
+                    "name": p.name,
+                    "price": p.price,
+                    "quantity": p.quantity,
+                    "total_value": p.total_value,
+                }
+            return {"id": pid, "error": "Not found"}
+
+    try:
+        tasks = [asyncio.create_task(get_one(pid)) for pid in data.product_ids]
+        results = await asyncio.wait_for(asyncio.gather(*tasks), timeout=5.0)
+        return list(results)
+    except asyncio.TimeoutError:
+        raise HTTPException(
+            status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+            detail="Час очікування пакетної операції вичерпано",
+        )
