@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lab_10"
+version = "1.0.0"
+description = "Laboratory work #10 (Variant 3) - Production Python: Docker, CI/CD, and Final Defense"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "sqlalchemy",
+    "pydantic",
+    "pydantic-settings",
+    "httpx",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov",
+    "build",
+]
+
+[project.scripts]
+lab_10 = "lab_10.main:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "src"]
+addopts = ["-ra"]
+
+[tool.coverage.run]
+branch = true
+source = ["lab_10"]
+omit = ["*/main.py", "main.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+fail_under = 80
