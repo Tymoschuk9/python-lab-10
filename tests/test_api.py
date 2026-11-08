@@ -217,8 +217,8 @@ def test_batch_products_concurrent(client) -> None:
     assert data[2]["error"] == "Not found"
 
 
-@pytest.mark.asyncio
-async def test_external_api_fetch():
+def test_external_api_fetch():
+    import asyncio
     from unittest.mock import AsyncMock, MagicMock, patch
     try:
         from lab_10.external_api import fetch_many_products
@@ -231,6 +231,13 @@ async def test_external_api_fetch():
 
     with patch("httpx.AsyncClient.get", new_callable=AsyncMock) as mock_get:
         mock_get.return_value = mock_resp
-        results = await fetch_many_products("http://test", [1, 2])
+        results = asyncio.run(fetch_many_products("http://test", [1, 2]))
         assert len(results) == 2
         assert results[0]["name"] == "Mock Product"
+
+
+def test_online_store_package_import():
+    import online_store
+    assert online_store.__name__ == "online_store"
+    assert online_store.app is not None
+    assert online_store.ShopService is not None

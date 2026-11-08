@@ -21,6 +21,7 @@ dependencies = [
 dev = [
     "pytest>=8.0",
     "pytest-cov",
+    "pytest-asyncio",
     "build",
     "ruff",
     "mypy",
@@ -37,7 +38,7 @@ addopts = ["-ra"]
 
 [tool.coverage.run]
 branch = true
-source = ["online_store", "lab_10"]
+source = ["lab_10"]
 omit = ["*/main.py", "main.py"]
 
 [tool.coverage.report]

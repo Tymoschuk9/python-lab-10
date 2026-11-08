@@ -31,7 +31,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          pytest -v --cov=online_store --cov=lab_10 --cov-report=term-missing
+          pytest -v --cov=lab_10 --cov-report=term-missing
 
       - name: Build distribution packages (wheel and sdist)
         run: |
